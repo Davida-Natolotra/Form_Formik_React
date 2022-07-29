@@ -1,4 +1,12 @@
-import { TextField, Button, Stack, Grid } from "@mui/material";
+import { useState } from "react";
+import {
+  TextField,
+  Button,
+  Stack,
+  Grid,
+  Autocomplete,
+  Box
+} from "@mui/material";
 import frLocale from "date-fns/locale/fr";
 import { frFR as calFR } from "@mui/x-date-pickers";
 import Radio from "@mui/material/Radio";
@@ -12,6 +20,7 @@ import * as Yup from "yup";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 
 const FormReact = () => {
   const validationSchema = Yup.object({
@@ -21,8 +30,8 @@ const FormReact = () => {
       "Date requis"
     ),
     prenom: Yup.string().required("Prénom PAX requis"),
-    CIU: Yup.string().required("CIU requis")
-    // typeCible: Yup.string().required("Type cible requis"),
+    CIU: Yup.string().required("CIU requis"),
+    typeCible: Yup.string().required("Type cible requis")
     // region: Yup.string().required("Région requis"),
     // tDemande: Yup.string().required("Typ de demande requis"),
     // referent: Yup.string().required("Référent requis"),
@@ -34,8 +43,8 @@ const FormReact = () => {
       sexe: "",
       dateCollecte: "",
       prenom: "",
-      CIU: ""
-      // typeCible: "",
+      CIU: "",
+      typeCible: ""
       // region: "",
       // tDemande: "",
       // referent: "",
@@ -58,6 +67,18 @@ const FormReact = () => {
     resetForm,
     setFieldValue
   } = formik;
+
+  const options = [
+    { label: "The Shawshank Redemption", year: 1994 },
+    { label: "The Godfather", year: 1972 },
+    { label: "The Godfather: Part II", year: 1974 },
+    { label: "The Dark Knight", year: 2008 },
+    { label: "12 Angry Men", year: 1957 },
+    { label: "Schindler's List", year: 1993 },
+    { label: "Pulp Fiction", year: 1994 }
+  ];
+
+  const [value, setValue] = useState(null);
   return (
     <Grid container>
       <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
@@ -89,12 +110,12 @@ const FormReact = () => {
                   <FormControlLabel
                     value="female"
                     control={<Radio />}
-                    label="Female"
+                    label="Feminin"
                   />
                   <FormControlLabel
                     value="male"
                     control={<Radio />}
-                    label="Male"
+                    label="Masculin"
                   />
                 </RadioGroup>
                 <FormHelperText>{touched.sexe && errors.sexe}</FormHelperText>
@@ -144,6 +165,45 @@ const FormReact = () => {
                 helperText={touched.CIU && errors.CIU}
               />
 
+              <Autocomplete
+                name="typeCible"
+                fullWidth
+                options={options}
+                autoHighlight
+                getOptionLabel={(option) => option.label}
+                value={value}
+                onChange={(event, newValue) => {
+                  setValue(newValue);
+                }}
+                inputValue={values.typeCible}
+                onInputChange={(event, newInputValue) => {
+                  setFieldValue("typeCible", newInputValue);
+                }}
+                freeSolo
+                renderOption={(props, option) => (
+                  <Box
+                    component="li"
+                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                    {...props}
+                  >
+                    {option.label}
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+                    <GpsFixedIcon
+                      sx={{ color: "action.active", mr: 1, my: 0.5 }}
+                    />
+                    <TextField
+                      {...params}
+                      label="Type de cible"
+                      variant="standard"
+                      error={Boolean(touched.typeCible && errors.typeCible)}
+                      helperText={touched.typeCible && errors.typeCible}
+                    />
+                  </Box>
+                )}
+              />
               <Button variant="contained" type="submit">
                 Save
               </Button>
