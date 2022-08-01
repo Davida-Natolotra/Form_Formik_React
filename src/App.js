@@ -8,6 +8,7 @@ import Box from "@mui/material/Box";
 
 import FormReact from "./Form";
 import VIH from "./VIH";
+import Moto from "./Moto";
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -59,7 +60,7 @@ export default function BasicTabs() {
         >
           <Tab label="Form default" {...a11yProps(0)} />
           <Tab label="VIH" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+          <Tab label="Moto" {...a11yProps(2)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -69,7 +70,7 @@ export default function BasicTabs() {
         <VIH />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <Moto />
       </TabPanel>
     </Box>
   );

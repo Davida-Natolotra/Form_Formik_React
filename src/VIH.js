@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   TextField,
   Button,
@@ -21,6 +21,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
+import PinDropIcon from "@mui/icons-material/PinDrop";
 
 const FormReact = () => {
   const validationSchema = Yup.object({
@@ -31,10 +32,10 @@ const FormReact = () => {
     ),
     prenom: Yup.string().required("Prénom PAX requis"),
     CIU: Yup.string().required("CIU requis"),
-    typeCible: Yup.string().required("Type cible requis")
-    // region: Yup.string().required("Région requis"),
-    // tDemande: Yup.string().required("Typ de demande requis"),
-    // referent: Yup.string().required("Référent requis"),
+    typeCible: Yup.string().required("Type cible requis"),
+    region: Yup.string().required("Région requis"),
+    tDemande: Yup.string().required("Typ de demande requis"),
+    referent: Yup.string().required("Référent requis")
     // pSensibilisation: Yup.string().required("Page de sensibilisation requise")
   });
   const formik = useFormik({
@@ -44,10 +45,10 @@ const FormReact = () => {
       dateCollecte: "",
       prenom: "",
       CIU: "",
-      typeCible: ""
-      // region: "",
-      // tDemande: "",
-      // referent: "",
+      typeCible: "",
+      region: "",
+      tDemande: "",
+      referent: "[]"
       // pSensibilisation: ""
     },
     onSubmit: (val, { resetForm }) => {
@@ -68,17 +69,89 @@ const FormReact = () => {
     setFieldValue
   } = formik;
 
-  const options = [
-    { label: "The Shawshank Redemption", year: 1994 },
-    { label: "The Godfather", year: 1972 },
-    { label: "The Godfather: Part II", year: 1974 },
-    { label: "The Dark Knight", year: 2008 },
-    { label: "12 Angry Men", year: 1957 },
-    { label: "Schindler's List", year: 1993 },
-    { label: "Pulp Fiction", year: 1994 }
+  const options = [{ label: "HSH" }, { label: "PS" }, { label: "UDI" }];
+  const regions = [
+    { label: "BOENY" },
+    { label: "DIANA" },
+    { label: "SAVA" },
+    { label: "BETSIBOKA" },
+    { label: "MELAKY" },
+    { label: "SOFIA" },
+    { label: "ANALAMANGA" },
+    { label: "VAKINANKARATRA" },
+    { label: "ALAOTRA MANGORO" },
+    { label: "ATSINANANA" },
+    { label: "ITASY" },
+    { label: "BONGOLAVA" },
+    { label: "HAUTE MATSIATRA" },
+    { label: "ATSIMO ANDREFANA" },
+    { label: "VATOVAVY" },
+    { label: "FITOVINANY" },
+    { label: "ANDROY" },
+    { label: "MENABE" },
+    { label: "IHOROMBE" }
   ];
 
+  const referents = [
+    {
+      region: "BOENY",
+      lieu: [
+        { label: "CSI MAHABIBO" },
+        { label: "CSB 2 MAHAVOKY ATSIMO" },
+        { label: "CSAJ TSARARANO AMBANY" },
+        { label: "CSB 2 TSARARANO AMBONY" },
+        { label: "CSB 2 ANTANIMASAJA" },
+        { label: "CSB 2 AMBOROVY" },
+        { label: "CSB 2 TANAMBAO SOTEMA" },
+        { label: "CSB U MAROVOAY" },
+        { label: "CSB 2 AMBATOBOENY" }
+      ]
+    },
+    {
+      region: "DIANA",
+      lieu: [
+        { label: "CSB 2 HELL VILLE" },
+        { label: "CSB 2 DZAMANDZAR" },
+        { label: "CSB 1 AMBATOLOAKA" },
+        { label: "CSB 2 AMBANJA" },
+        { label: "CSB 2 AMBILOBE" }
+      ]
+    },
+    { region: "SAVA", lieu: [] },
+    { region: "BETSIBOKA", lieu: [] },
+    { region: "MELAKY", lieu: [] },
+    { region: "SOFIA", lieu: [] },
+    { region: "ANALAMANGA", lieu: [] },
+    { region: "VAKINANKARATRA", lieu: [] },
+    { region: "ALAOTRA MANGORO", lieu: [] },
+    { region: "ATSINANANA", lieu: [] },
+    { region: "ITASY", lieu: [] },
+    { region: "BONGOLAVA", lieu: [] },
+    { region: "HAUTE MATSIATRA", lieu: [] },
+    { region: "ATSIMO ANDREFANA", lieu: [] },
+    { region: "VATOVAVY", lieu: [] },
+    { region: "FITOVINANY", lieu: [] },
+    { region: "ANDROY", lieu: [] },
+    { region: "MENABE", lieu: [] },
+    { region: "IHOROMBE", lieu: [] }
+  ];
+  console.log(values.region);
+  const firstUpdate = useRef(true);
+  useEffect(() => {
+    if (firstUpdate.current) {
+      firstUpdate.current = false;
+    } else {
+      console.log(
+        referents.find((val) => val.region === values.region)?.lieu || []
+      );
+    }
+  }, [values.region]);
+
   const [value, setValue] = useState(null);
+  const [valRegion, setValRegion] = useState(null);
+  const [valRef, setValRef] = useState(null);
+  const [valTDemande, setValTDemande] = useState(null);
+
   return (
     <Grid container>
       <Grid item xs={12} sx={{ display: "flex", justifyContent: "center" }}>
@@ -88,6 +161,7 @@ const FormReact = () => {
               <h2>Form VIH</h2>
 
               <TextField
+                variant="standard"
                 label="Nom FB"
                 name="nomFB"
                 onChange={handleChange}
@@ -137,6 +211,7 @@ const FormReact = () => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      variant="standard"
                       error={Boolean(
                         touched.dateCollecte && errors.dateCollecte
                       )}
@@ -148,6 +223,7 @@ const FormReact = () => {
                 />
               </LocalizationProvider>
               <TextField
+                variant="standard"
                 label="Prenom PAX"
                 prenom
                 name="prenom"
@@ -157,6 +233,7 @@ const FormReact = () => {
                 helperText={touched.prenom && errors.prenom}
               />
               <TextField
+                variant="standard"
                 label="CIU"
                 name="CIU"
                 onChange={handleChange}
@@ -204,6 +281,88 @@ const FormReact = () => {
                   </Box>
                 )}
               />
+
+              <Autocomplete
+                name="region"
+                fullWidth
+                options={regions}
+                autoHighlight
+                getOptionLabel={(option) => option.label}
+                value={valRegion}
+                onChange={(event, newValue) => {
+                  setValRegion(newValue);
+                }}
+                inputValue={values.region}
+                onInputChange={(event, newInputValue) => {
+                  setFieldValue("region", newInputValue);
+                }}
+                renderOption={(props, option) => (
+                  <Box
+                    component="li"
+                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                    {...props}
+                  >
+                    {option.label}
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+                    <PinDropIcon
+                      sx={{ color: "action.active", mr: 1, my: 0.5 }}
+                    />
+                    <TextField
+                      {...params}
+                      label="Région"
+                      variant="standard"
+                      error={Boolean(touched.region && errors.region)}
+                      helperText={touched.region && errors.region}
+                    />
+                  </Box>
+                )}
+              />
+
+              <Autocomplete
+                name="referent"
+                fullWidth
+                options={
+                  referents.find((val) => val.region === values.region)?.lieu ||
+                  []
+                }
+                autoHighlight
+                getOptionLabel={(option) => option.label}
+                value={valRef}
+                onChange={(event, newValue) => {
+                  setValRef(newValue);
+                }}
+                inputValue={values.referent}
+                onInputChange={(event, newInputValue) => {
+                  setFieldValue("referent", newInputValue);
+                }}
+                renderOption={(props, option) => (
+                  <Box
+                    component="li"
+                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                    {...props}
+                  >
+                    {option.label}
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+                    <PinDropIcon
+                      sx={{ color: "action.active", mr: 1, my: 0.5 }}
+                    />
+                    <TextField
+                      {...params}
+                      label="Référé à"
+                      variant="standard"
+                      error={Boolean(touched.referent && errors.referent)}
+                      helperText={touched.referent && errors.referent}
+                    />
+                  </Box>
+                )}
+              />
+
               <Button variant="contained" type="submit">
                 Save
               </Button>
