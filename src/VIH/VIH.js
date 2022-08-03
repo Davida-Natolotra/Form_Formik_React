@@ -264,20 +264,17 @@ const FormReact = () => {
                   </Box>
                 )}
               />
-              <FormControl
-                fullWidth
-                variant="standard"
-                error={Boolean(touched.referent && errors.referent)}
-                helperText={touched.referent && errors.referent}
-              >
-                <InputLabel id="referentId">Référé à</InputLabel>
-                <Select
-                  labelId="referentLabel"
-                  id="referent"
+              <Box sx={{ display: "flex", alignItems: "flex-end" }}>
+                <GpsFixedIcon sx={{ color: "action.active", mr: 1, my: 0.5 }} />
+                <TextField
+                  select
                   label="Référé à"
-                  onChange={(e) => setFieldValue("referent", e.target.value)}
                   name="referent"
+                  onChange={handleChange}
+                  fullWidth
+                  variant="standard"
                   value={values.referent}
+                  onBlur={handleBlur}
                 >
                   <MenuItem value="">
                     <em>Aucun</em>
@@ -288,8 +285,8 @@ const FormReact = () => {
                       {item.label}
                     </MenuItem>
                   ))}
-                </Select>
-              </FormControl>
+                </TextField>
+              </Box>
 
               <Button variant="contained" type="submit">
                 Save
