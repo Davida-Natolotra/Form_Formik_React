@@ -7,7 +7,7 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
 import FormReact from "./Form";
-import VIH from "./VIH";
+import VIH from "./VIH/VIH";
 import Moto from "./Moto";
 
 function TabPanel(props) {

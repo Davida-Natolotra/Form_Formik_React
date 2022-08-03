@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import {
   TextField,
   Button,
@@ -22,6 +22,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 import PinDropIcon from "@mui/icons-material/PinDrop";
+import { referent$ } from "./store";
 
 const FormReact = () => {
   const validationSchema = Yup.object({
@@ -48,7 +49,7 @@ const FormReact = () => {
       typeCible: "",
       region: "",
       tDemande: "",
-      referent: "[]"
+      referent: []
       // pSensibilisation: ""
     },
     onSubmit: (val, { resetForm }) => {
@@ -92,65 +93,23 @@ const FormReact = () => {
     { label: "IHOROMBE" }
   ];
 
-  const referents = [
-    {
-      region: "BOENY",
-      lieu: [
-        { label: "CSI MAHABIBO" },
-        { label: "CSB 2 MAHAVOKY ATSIMO" },
-        { label: "CSAJ TSARARANO AMBANY" },
-        { label: "CSB 2 TSARARANO AMBONY" },
-        { label: "CSB 2 ANTANIMASAJA" },
-        { label: "CSB 2 AMBOROVY" },
-        { label: "CSB 2 TANAMBAO SOTEMA" },
-        { label: "CSB U MAROVOAY" },
-        { label: "CSB 2 AMBATOBOENY" }
-      ]
-    },
-    {
-      region: "DIANA",
-      lieu: [
-        { label: "CSB 2 HELL VILLE" },
-        { label: "CSB 2 DZAMANDZAR" },
-        { label: "CSB 1 AMBATOLOAKA" },
-        { label: "CSB 2 AMBANJA" },
-        { label: "CSB 2 AMBILOBE" }
-      ]
-    },
-    { region: "SAVA", lieu: [] },
-    { region: "BETSIBOKA", lieu: [] },
-    { region: "MELAKY", lieu: [] },
-    { region: "SOFIA", lieu: [] },
-    { region: "ANALAMANGA", lieu: [] },
-    { region: "VAKINANKARATRA", lieu: [] },
-    { region: "ALAOTRA MANGORO", lieu: [] },
-    { region: "ATSINANANA", lieu: [] },
-    { region: "ITASY", lieu: [] },
-    { region: "BONGOLAVA", lieu: [] },
-    { region: "HAUTE MATSIATRA", lieu: [] },
-    { region: "ATSIMO ANDREFANA", lieu: [] },
-    { region: "VATOVAVY", lieu: [] },
-    { region: "FITOVINANY", lieu: [] },
-    { region: "ANDROY", lieu: [] },
-    { region: "MENABE", lieu: [] },
-    { region: "IHOROMBE", lieu: [] }
-  ];
-  console.log(values.region);
-  const firstUpdate = useRef(true);
+  const [referents, setReferents] = useState([]);
+  const [referentsListe, setReferentsListe] = useState([]);
+
   useEffect(() => {
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-    } else {
-      console.log(
-        referents.find((val) => val.region === values.region)?.lieu || []
-      );
-    }
-  }, [values.region]);
+    const sub = referent$.subscribe(setReferents);
+    return () => sub.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    setReferentsListe(
+      referents.find((val) => val.region === values.region)?.lieu || []
+    );
+  }, [referents, values.region]);
 
   const [value, setValue] = useState(null);
   const [valRegion, setValRegion] = useState(null);
   const [valRef, setValRef] = useState(null);
-  const [valTDemande, setValTDemande] = useState(null);
 
   return (
     <Grid container>
@@ -296,6 +255,7 @@ const FormReact = () => {
                 onInputChange={(event, newInputValue) => {
                   setFieldValue("region", newInputValue);
                 }}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 renderOption={(props, option) => (
                   <Box
                     component="li"
@@ -321,47 +281,12 @@ const FormReact = () => {
                 )}
               />
 
-              <Autocomplete
-                name="referent"
-                fullWidth
-                options={
-                  referents.find((val) => val.region === values.region)?.lieu ||
-                  []
-                }
-                autoHighlight
-                getOptionLabel={(option) => option.label}
-                value={valRef}
-                onChange={(event, newValue) => {
-                  setValRef(newValue);
-                }}
-                inputValue={values.referent}
-                onInputChange={(event, newInputValue) => {
-                  setFieldValue("referent", newInputValue);
-                }}
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                    {...props}
-                  >
-                    {option.label}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <Box sx={{ display: "flex", alignItems: "flex-end" }}>
-                    <PinDropIcon
-                      sx={{ color: "action.active", mr: 1, my: 0.5 }}
-                    />
-                    <TextField
-                      {...params}
-                      label="Référé à"
-                      variant="standard"
-                      error={Boolean(touched.referent && errors.referent)}
-                      helperText={touched.referent && errors.referent}
-                    />
-                  </Box>
-                )}
-              />
+              <div>
+                <h2>Referents</h2>
+                {referentsListe.map((el) => (
+                  <p key={el.index}>{el.label}</p>
+                ))}
+              </div>
 
               <Button variant="contained" type="submit">
                 Save
