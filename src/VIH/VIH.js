@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   TextField,
   Button,
@@ -22,7 +22,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import GpsFixedIcon from "@mui/icons-material/GpsFixed";
 import PinDropIcon from "@mui/icons-material/PinDrop";
-import { referent$ } from "./store";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import { v4 as uuidv4 } from "uuid";
+import { referent$, regions } from "./store";
 
 const FormReact = () => {
   const validationSchema = Yup.object({
@@ -36,7 +40,7 @@ const FormReact = () => {
     typeCible: Yup.string().required("Type cible requis"),
     region: Yup.string().required("Région requis"),
     tDemande: Yup.string().required("Typ de demande requis"),
-    referent: Yup.string().required("Référent requis")
+    referent: Yup.string()
     // pSensibilisation: Yup.string().required("Page de sensibilisation requise")
   });
   const formik = useFormik({
@@ -53,7 +57,7 @@ const FormReact = () => {
       // pSensibilisation: ""
     },
     onSubmit: (val, { resetForm }) => {
-      console.log(val);
+      alert(val);
       resetForm();
     },
     validationSchema
@@ -71,27 +75,6 @@ const FormReact = () => {
   } = formik;
 
   const options = [{ label: "HSH" }, { label: "PS" }, { label: "UDI" }];
-  const regions = [
-    { label: "BOENY" },
-    { label: "DIANA" },
-    { label: "SAVA" },
-    { label: "BETSIBOKA" },
-    { label: "MELAKY" },
-    { label: "SOFIA" },
-    { label: "ANALAMANGA" },
-    { label: "VAKINANKARATRA" },
-    { label: "ALAOTRA MANGORO" },
-    { label: "ATSINANANA" },
-    { label: "ITASY" },
-    { label: "BONGOLAVA" },
-    { label: "HAUTE MATSIATRA" },
-    { label: "ATSIMO ANDREFANA" },
-    { label: "VATOVAVY" },
-    { label: "FITOVINANY" },
-    { label: "ANDROY" },
-    { label: "MENABE" },
-    { label: "IHOROMBE" }
-  ];
 
   const [referents, setReferents] = useState([]);
   const [referentsListe, setReferentsListe] = useState([]);
@@ -105,7 +88,7 @@ const FormReact = () => {
     setReferentsListe(
       referents.find((val) => val.region === values.region)?.lieu || []
     );
-  }, [referents, values.region]);
+  }, [values.region]);
 
   const [value, setValue] = useState(null);
   const [valRegion, setValRegion] = useState(null);
@@ -126,6 +109,7 @@ const FormReact = () => {
                 onChange={handleChange}
                 value={values.nomFB}
                 onBlur={handleBlur}
+                required
                 error={Boolean(touched.nomFB && errors.nomFB)}
                 helperText={touched.nomFB && errors.nomFB}
               />
@@ -280,13 +264,32 @@ const FormReact = () => {
                   </Box>
                 )}
               />
+              <FormControl
+                fullWidth
+                variant="standard"
+                error={Boolean(touched.referent && errors.referent)}
+                helperText={touched.referent && errors.referent}
+              >
+                <InputLabel id="referentId">Référé à</InputLabel>
+                <Select
+                  labelId="referentLabel"
+                  id="referent"
+                  label="Référé à"
+                  onChange={(e) => setFieldValue("referent", e.target.value)}
+                  name="referent"
+                  value={values.referent}
+                >
+                  <MenuItem value="">
+                    <em>Aucun</em>
+                  </MenuItem>
 
-              <div>
-                <h2>Referents</h2>
-                {referentsListe.map((el) => (
-                  <p key={el.index}>{el.label}</p>
-                ))}
-              </div>
+                  {referentsListe.map((item) => (
+                    <MenuItem key={uuidv4()} value={item.label}>
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
               <Button variant="contained" type="submit">
                 Save
